@@ -28,6 +28,7 @@ export interface ElectronAPI {
   getSettings: () => Promise<Settings>
   setSettings: (settings: Settings) => Promise<void>
   updateBadge: (count: number) => void
+  openExternal: (url: string) => Promise<void>
 }
 
 declare global {

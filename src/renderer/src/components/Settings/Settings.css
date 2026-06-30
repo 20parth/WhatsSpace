@@ -208,6 +208,25 @@
   color: var(--text-primary);
 }
 
+.credits-author-link {
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.15s;
+}
+
+.credits-author-link:hover {
+  text-decoration-color: var(--accent);
+}
+
 .credits-sub {
   font-size: 11px;
   opacity: 0.7;

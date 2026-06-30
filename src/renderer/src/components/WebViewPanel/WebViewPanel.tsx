@@ -32,13 +32,40 @@ function WebViewItem({
     const el = ref.current
     if (!el) return
 
-    const handler = (e: Event) => {
+    const onTitleUpdate = (e: Event) => {
       const title = (e as CustomEvent & { title?: string }).title ?? ''
       onUnreadChange(parseUnread(title))
     }
 
-    el.addEventListener('page-title-updated', handler)
-    return () => el.removeEventListener('page-title-updated', handler)
+    // Fired when the webview calls window.open() or clicks a target="_blank" link.
+    // This is the primary intercept for WhatsApp link clicks.
+    const onNewWindow = (e: Event) => {
+      const url = (e as CustomEvent & { url?: string }).url ?? ''
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        window.electronAPI.openExternal(url)
+      }
+    }
+
+    // Fired when the webview itself navigates (e.g. direct href without target="_blank").
+    // We can't prevent it from the renderer, but we open it externally as well.
+    const onWillNavigate = (e: Event) => {
+      const url = (e as CustomEvent & { url?: string }).url ?? ''
+      if (url && !url.startsWith('https://web.whatsapp.com')) {
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+          window.electronAPI.openExternal(url)
+        }
+      }
+    }
+
+    el.addEventListener('page-title-updated', onTitleUpdate)
+    el.addEventListener('new-window', onNewWindow)
+    el.addEventListener('will-navigate', onWillNavigate)
+
+    return () => {
+      el.removeEventListener('page-title-updated', onTitleUpdate)
+      el.removeEventListener('new-window', onNewWindow)
+      el.removeEventListener('will-navigate', onWillNavigate)
+    }
   }, [onUnreadChange])
 
   return (

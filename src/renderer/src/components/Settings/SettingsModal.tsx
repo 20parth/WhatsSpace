@@ -115,7 +115,12 @@ export default function SettingsModal({ settings, onSave, onClose }: Props) {
           </div>
           <div className="credits-line">
             Designed &amp; built by{' '}
-            <span className="credits-author">Parth Bhawar</span>
+            <button
+              className="credits-author-link"
+              onClick={() => window.electronAPI.openExternal('https://parthrb.dev')}
+            >
+              Parth Bhawar
+            </button>
           </div>
           <div className="credits-line credits-sub">
             Multi-account WhatsApp Web for desktop

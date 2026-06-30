@@ -165,13 +165,45 @@ function createWindow(): void {
   }
 }
 
-// Grant notification permission to all webviews
 app.on('web-contents-created', (_event, contents) => {
+  // Permissions + downloads: apply eagerly for webview-type contents
   if (contents.getType() === 'webview') {
     contents.session.setPermissionRequestHandler((_wc, permission, cb) => {
       cb(['notifications', 'media', 'audioCapture'].includes(permission))
     })
+    contents.session.on('will-download', (_event, item) => {
+      const savePath = join(app.getPath('downloads'), item.getFilename())
+      item.setSavePath(savePath)
+      item.once('done', (_e, state) => {
+        if (state === 'completed') shell.openPath(savePath)
+      })
+    })
   }
+
+  // Link interception: wait for first load so we can verify via URL.
+  // getType() can be unreliable at webContents construction time in Electron 31;
+  // checking the loaded URL avoids that race.
+  contents.once('did-finish-load', () => {
+    if (!contents.getURL().startsWith('https://web.whatsapp.com')) return
+
+    // window.open() / target="_blank" → open in system browser, deny the popup
+    contents.setWindowOpenHandler(({ url }) => {
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        shell.openExternal(url).catch(console.error)
+      }
+      return { action: 'deny' }
+    })
+
+    // Top-level navigation away from WhatsApp (wa.me links, direct hrefs, etc.)
+    contents.on('will-navigate', (event, url) => {
+      if (!url.startsWith('https://web.whatsapp.com')) {
+        event.preventDefault()
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+          shell.openExternal(url).catch(console.error)
+        }
+      }
+    })
+  })
 })
 
 function registerShortcuts(): void {
@@ -181,6 +213,10 @@ function registerShortcuts(): void {
     })
   }
 }
+
+ipcMain.handle('shell:open-external', (_event, url: string) => {
+  return shell.openExternal(url)
+})
 
 ipcMain.handle('accounts:get', () => store.get('accounts', []))
 ipcMain.handle('accounts:set', (_event, accounts: Account[]) => {
