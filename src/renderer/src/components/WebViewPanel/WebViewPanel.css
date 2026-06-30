@@ -1,0 +1,51 @@
+.webview-panel {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #111827;
+}
+
+.webview-panel.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 72px;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.empty-state h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 14px;
+}
+
+.webview-container {
+  position: absolute;
+  inset: 0;
+}
+
+.webview-container.visible {
+  display: block;
+}
+
+.webview-container.hidden {
+  display: none;
+}
+
+webview {
+  display: flex;
+}

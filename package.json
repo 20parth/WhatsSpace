@@ -1,0 +1,44 @@
+{
+  "name": "whatsspace",
+  "version": "0.1.0",
+  "description": "Multi-account WhatsApp Web desktop wrapper",
+  "main": "out/main/index.js",
+  "author": "WhatsSpace",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "package": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.0",
+    "electron-vite": "^2.3.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "typescript": "^5.5.0"
+  },
+  "build": {
+    "appId": "com.whatsspace.app",
+    "productName": "WhatsSpace",
+    "directories": {
+      "output": "dist"
+    },
+    "files": ["out/**/*"],
+    "mac": {
+      "target": ["dmg", "pkg"],
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": ["nsis", "msi"]
+    }
+  }
+}
