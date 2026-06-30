@@ -229,10 +229,15 @@ app.on('web-contents-created', (_event, contents) => {
   contents.once('did-finish-load', () => {
     if (!contents.getURL().startsWith('https://web.whatsapp.com')) return
 
-    // window.open() / target="_blank" → open in system browser, deny the popup
+    // window.open() / target="_blank" → open in system browser, deny the popup.
+    // Also handles whatsspace-open: pseudo-URLs from the injected window.open override.
     contents.setWindowOpenHandler(({ url }) => {
-      if (url.startsWith('http://') || url.startsWith('https://')) {
-        shell.openExternal(url).catch(console.error)
+      let target = url
+      if (url.startsWith('whatsspace-open:')) {
+        target = decodeURIComponent(url.slice('whatsspace-open:'.length))
+      }
+      if (target.startsWith('http://') || target.startsWith('https://')) {
+        shell.openExternal(target).catch(console.error)
       }
       return { action: 'deny' }
     })
@@ -246,6 +251,30 @@ app.on('web-contents-created', (_event, contents) => {
         }
       }
     })
+
+    // Inject into the page itself: override window.open so WhatsApp's
+    // "Open link" dialog routes through setWindowOpenHandler via a hidden
+    // anchor click using the whatsspace-open: pseudo-protocol.
+    contents.executeJavaScript(`
+      (function () {
+        if (window.__wsPatched) return
+        window.__wsPatched = true
+        const _open = window.open.bind(window)
+        window.open = function (url, target, features) {
+          const href = typeof url === 'string' ? url : (url && url.toString ? url.toString() : '')
+          if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+            const a = document.createElement('a')
+            a.href = 'whatsspace-open:' + encodeURIComponent(href)
+            a.target = '_blank'
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            return null
+          }
+          return _open(url, target, features)
+        }
+      })()
+    `).catch(() => {})
   })
 })
 

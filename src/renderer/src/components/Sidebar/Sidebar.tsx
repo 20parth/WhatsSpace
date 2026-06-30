@@ -3,6 +3,7 @@ import { Account } from '../../types'
 import AccountItem from './AccountItem'
 import AddAccountModal from './AddAccountModal'
 import Icon from '../Icon/Icon'
+import logoSrc from '../../assets/logo.png'
 import './Sidebar.css'
 
 interface Props {
@@ -64,7 +65,7 @@ export default function Sidebar({
       <div className="sidebar-header">
         {!collapsed && (
           <div className="sidebar-logo">
-            <Icon name="message" size={20} color="var(--accent)" />
+            <img src={logoSrc} alt="WhatsSpace" className="logo-img" />
             <span className="logo-text">WhatsSpace</span>
           </div>
         )}

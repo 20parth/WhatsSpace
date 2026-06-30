@@ -7,6 +7,14 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()]
   },
   preload: {
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve('src/preload/index.ts'),
+          webview: resolve('src/preload/webview.ts'),
+        },
+      },
+    },
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {

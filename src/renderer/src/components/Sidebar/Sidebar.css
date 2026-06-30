@@ -37,6 +37,13 @@
   white-space: nowrap;
 }
 
+.logo-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .logo-text {
   font-size: 15px;
   font-weight: 700;
