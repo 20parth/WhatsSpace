@@ -165,6 +165,7 @@ function createWindow(): void {
     minHeight: 560,
     show: false,
     title: 'WhatsSpace',
+    icon: iconPath,
     autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
