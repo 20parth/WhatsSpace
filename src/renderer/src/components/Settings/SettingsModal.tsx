@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Settings } from '../../types'
+import Icon from '../Icon/Icon'
 import './Settings.css'
 
 interface Props {
@@ -22,21 +23,32 @@ export default function SettingsModal({ settings, onSave, onClose }: Props) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal settings-modal" onClick={(e) => e.stopPropagation()}>
-        <h2>⚙️ Settings</h2>
+        <div className="settings-header">
+          <h2>Settings</h2>
+          <button className="settings-close-btn" onClick={onClose}>
+            <Icon name="close" size={16} />
+          </button>
+        </div>
 
         <section className="settings-section">
           <div className="settings-section-title">Appearance</div>
-
           <div className="settings-row">
             <span className="settings-label">Theme</span>
             <div className="theme-toggle">
-              {(['light', 'dark', 'system'] as const).map((t) => (
+              {(
+                [
+                  { id: 'light', icon: 'sun', label: 'Light' },
+                  { id: 'dark', icon: 'moon', label: 'Dark' },
+                  { id: 'system', icon: 'monitor', label: 'System' },
+                ] as const
+              ).map(({ id, icon, label }) => (
                 <button
-                  key={t}
-                  className={`theme-btn ${draft.theme === t ? 'active' : ''}`}
-                  onClick={() => set('theme', t)}
+                  key={id}
+                  className={`theme-btn ${draft.theme === id ? 'active' : ''}`}
+                  onClick={() => set('theme', id)}
                 >
-                  {t === 'light' ? '☀️ Light' : t === 'dark' ? '🌙 Dark' : '💻 System'}
+                  <Icon name={icon} size={13} />
+                  {label}
                 </button>
               ))}
             </div>
@@ -88,14 +100,14 @@ export default function SettingsModal({ settings, onSave, onClose }: Props) {
 
         <div className="modal-actions">
           <button onClick={onClose}>Cancel</button>
-          <button className="primary" onClick={handleSave}>
-            Save
-          </button>
+          <button className="primary" onClick={handleSave}>Save</button>
         </div>
 
         <div className="credits-block">
           <div className="credits-app">
-            <span className="credits-icon">💬</span>
+            <div className="credits-app-icon">
+              <Icon name="message" size={22} color="var(--accent)" />
+            </div>
             <div>
               <div className="credits-app-name">WhatsSpace</div>
               <div className="credits-version">v0.1.0</div>

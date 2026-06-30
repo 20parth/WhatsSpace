@@ -1,28 +1,40 @@
 .sidebar {
-  width: var(--sidebar-width, 240px);
-  min-width: var(--sidebar-width, 240px);
+  width: 240px;
+  min-width: 240px;
   background: var(--bg-secondary);
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--border);
   overflow: hidden;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.sidebar.collapsed {
+  width: 62px;
+  min-width: 62px;
+}
+
+/* ── Header ─────────────────────────────────────── */
 .sidebar-header {
-  padding: 16px 12px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 10px 10px;
   flex-shrink: 0;
+  gap: 6px;
+}
+
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
 }
 
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
-  padding-left: 4px;
-}
-
-.logo-icon {
-  font-size: 22px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .logo-text {
@@ -32,12 +44,47 @@
   letter-spacing: -0.3px;
 }
 
+.collapse-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.collapse-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ── Search ──────────────────────────────────────── */
+.sidebar-search-wrap {
+  position: relative;
+  margin: 0 10px 8px;
+  flex-shrink: 0;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
 .sidebar-search {
   width: 100%;
   background: var(--bg-input);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 6px 12px;
+  padding: 6px 12px 6px 32px;
   color: var(--text-primary);
   font-size: 12px;
   outline: none;
@@ -52,10 +99,16 @@
   border-color: var(--accent);
 }
 
+/* ── Account list ────────────────────────────────── */
 .account-list {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 4px 8px;
+}
+
+.sidebar.collapsed .account-list {
+  padding: 4px 5px;
 }
 
 .account-list::-webkit-scrollbar {
@@ -74,57 +127,177 @@
   text-align: center;
 }
 
-/* Footer: Add Account + Settings gear */
+/* ── Footer ──────────────────────────────────────── */
 .sidebar-footer {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding: 8px;
   flex-shrink: 0;
   border-top: 1px solid var(--border);
 }
 
-.add-account-btn {
-  flex: 1;
+.sidebar.collapsed .sidebar-footer {
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 5px;
+}
+
+.footer-icon-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 12px;
-  background: transparent;
-  border: 1px dashed var(--border);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
-
-.add-account-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.add-icon {
-  font-size: 16px;
-  line-height: 1;
-}
-
-.settings-btn {
-  width: 36px;
-  height: 36px;
+  height: 34px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
   cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
-.settings-btn:hover {
+.footer-icon-btn:hover {
   background: var(--bg-hover);
+  color: var(--text-primary);
   border-color: var(--text-secondary);
+}
+
+.add-btn {
+  flex: 1;
+  padding: 0 12px;
+  justify-content: flex-start;
+}
+
+.sidebar.collapsed .add-btn {
+  flex: none;
+  width: 36px;
+  padding: 0;
+  justify-content: center;
+}
+
+.footer-icon-btn:not(.add-btn) {
+  width: 36px;
+  padding: 0;
+  justify-content: center;
+}
+
+.footer-btn-label {
+  font-size: 13px;
+}
+
+/* ── Account item ────────────────────────────────── */
+.account-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  margin-bottom: 2px;
+  border-left: 3px solid transparent;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.account-item:hover {
+  background: var(--bg-hover);
+}
+
+.account-item.active {
+  background: var(--bg-active);
+  border-left-color: var(--accent);
+}
+
+.account-item.collapsed {
+  justify-content: center;
+  padding: 7px 4px;
+  border-left-color: transparent !important;
+  gap: 0;
+}
+
+.account-item.collapsed.active {
+  background: var(--bg-active);
+  border-radius: 8px;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.account-item.dragging { opacity: 0.35; }
+
+.account-item.drag-over {
+  background: var(--bg-hover);
+  outline: 1px dashed var(--accent);
+  outline-offset: -1px;
+}
+
+/* ── Avatar ──────────────────────────────────────── */
+.avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.account-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.unread-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg-secondary);
+}
+
+/* ── Info / badges ───────────────────────────────── */
+.account-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.account-name {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+}
+
+.account-shortcut {
+  font-size: 10px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.unread-badge {
+  flex-shrink: 0;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }

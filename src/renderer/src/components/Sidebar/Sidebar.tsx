@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Account } from '../../types'
 import AccountItem from './AccountItem'
 import AddAccountModal from './AddAccountModal'
+import Icon from '../Icon/Icon'
 import './Sidebar.css'
 
 interface Props {
@@ -9,8 +10,8 @@ interface Props {
   activeId: string | null
   unreadCounts: Record<string, number>
   onSelect: (id: string) => void
-  onAdd: (name: string, emoji: string, color: string) => void
-  onRename: (id: string, name: string, emoji: string, color: string) => void
+  onAdd: (name: string, icon: string, color: string) => void
+  onRename: (id: string, name: string, icon: string, color: string) => void
   onDelete: (id: string) => void
   onTogglePin: (id: string) => void
   onReorder: (accounts: Account[]) => void
@@ -29,12 +30,15 @@ export default function Sidebar({
   onReorder,
   onOpenSettings,
 }: Props) {
+  const [collapsed, setCollapsed] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
   const [search, setSearch] = useState('')
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dragOverId, setDragOverId] = useState<string | null>(null)
 
-  const filtered = search
+  const filtered = collapsed
+    ? accounts
+    : search
     ? accounts.filter((a) => a.name.toLowerCase().includes(search.toLowerCase()))
     : accounts
 
@@ -51,23 +55,41 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
+      {/* Header */}
       <div className="sidebar-header">
-        <div className="sidebar-logo">
-          <span className="logo-icon">💬</span>
-          <span className="logo-text">WhatsSpace</span>
-        </div>
-        <input
-          className="sidebar-search"
-          type="text"
-          placeholder="Search accounts..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        {!collapsed && (
+          <div className="sidebar-logo">
+            <Icon name="message" size={20} color="var(--accent)" />
+            <span className="logo-text">WhatsSpace</span>
+          </div>
+        )}
+        <button
+          className="collapse-btn"
+          onClick={() => setCollapsed((c) => !c)}
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <Icon name={collapsed ? 'chevron-right' : 'chevron-left'} size={16} />
+        </button>
       </div>
 
+      {/* Search — hidden when collapsed */}
+      {!collapsed && (
+        <div className="sidebar-search-wrap">
+          <Icon name="search" size={14} color="var(--text-secondary)" className="search-icon" />
+          <input
+            className="sidebar-search"
+            type="text"
+            placeholder="Search accounts..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      )}
+
+      {/* Account list */}
       <div className="account-list">
-        {filtered.length === 0 && search && (
+        {!collapsed && filtered.length === 0 && search && (
           <p className="no-results">No accounts match "{search}"</p>
         )}
         {filtered.map((account, index) => (
@@ -76,11 +98,12 @@ export default function Sidebar({
             account={account}
             displayIndex={index}
             unreadCount={unreadCounts[account.id] ?? 0}
+            collapsed={collapsed}
             isActive={account.id === activeId}
             isDragging={account.id === draggingId}
             isDragOver={account.id === dragOverId}
             onSelect={() => onSelect(account.id)}
-            onRename={(name, emoji, color) => onRename(account.id, name, emoji, color)}
+            onRename={(name, icon, color) => onRename(account.id, name, icon, color)}
             onDelete={() => onDelete(account.id)}
             onTogglePin={() => onTogglePin(account.id)}
             onDragStart={() => setDraggingId(account.id)}
@@ -94,20 +117,29 @@ export default function Sidebar({
         ))}
       </div>
 
+      {/* Footer */}
       <div className="sidebar-footer">
-        <button className="add-account-btn" onClick={() => setShowAdd(true)}>
-          <span className="add-icon">＋</span>
-          <span>Add Account</span>
+        <button
+          className="footer-icon-btn add-btn"
+          onClick={() => setShowAdd(true)}
+          title="Add account"
+        >
+          <Icon name="plus" size={16} />
+          {!collapsed && <span className="footer-btn-label">Add Account</span>}
         </button>
-        <button className="settings-btn" onClick={onOpenSettings} title="Settings">
-          ⚙️
+        <button
+          className="footer-icon-btn"
+          onClick={onOpenSettings}
+          title="Settings"
+        >
+          <Icon name="settings" size={16} />
         </button>
       </div>
 
       {showAdd && (
         <AddAccountModal
-          onAdd={(name, emoji, color) => {
-            onAdd(name, emoji, color)
+          onAdd={(name, icon, color) => {
+            onAdd(name, icon, color)
             setShowAdd(false)
           }}
           onClose={() => setShowAdd(false)}
