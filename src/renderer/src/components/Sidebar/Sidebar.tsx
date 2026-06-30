@@ -9,6 +9,7 @@ interface Props {
   accounts: Account[]
   activeId: string | null
   unreadCounts: Record<string, number>
+  privacyMode: boolean
   onSelect: (id: string) => void
   onAdd: (name: string, icon: string, color: string) => void
   onRename: (id: string, name: string, icon: string, color: string) => void
@@ -16,12 +17,14 @@ interface Props {
   onTogglePin: (id: string) => void
   onReorder: (accounts: Account[]) => void
   onOpenSettings: () => void
+  onTogglePrivacy: () => void
 }
 
 export default function Sidebar({
   accounts,
   activeId,
   unreadCounts,
+  privacyMode,
   onSelect,
   onAdd,
   onRename,
@@ -29,6 +32,7 @@ export default function Sidebar({
   onTogglePin,
   onReorder,
   onOpenSettings,
+  onTogglePrivacy,
 }: Props) {
   const [collapsed, setCollapsed] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
@@ -126,6 +130,13 @@ export default function Sidebar({
         >
           <Icon name="plus" size={16} />
           {!collapsed && <span className="footer-btn-label">Add Account</span>}
+        </button>
+        <button
+          className={`footer-icon-btn privacy-btn ${privacyMode ? 'active' : ''}`}
+          onClick={onTogglePrivacy}
+          title={`Privacy mode (⌘⇧L) — ${privacyMode ? 'on' : 'off'}`}
+        >
+          <Icon name={privacyMode ? 'eye-off' : 'eye'} size={16} color={privacyMode ? 'var(--accent)' : 'currentColor'} />
         </button>
         <button
           className="footer-icon-btn"

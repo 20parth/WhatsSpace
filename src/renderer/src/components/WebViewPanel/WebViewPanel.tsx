@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Account } from '../../types'
+import Icon from '../Icon/Icon'
 import './WebViewPanel.css'
 
 const WA_URL = 'https://web.whatsapp.com'
@@ -9,6 +10,7 @@ const WA_UA =
 interface Props {
   accounts: Account[]
   activeId: string | null
+  privacyMode: boolean
   onUnreadChange: (id: string, count: number) => void
 }
 
@@ -82,7 +84,7 @@ function WebViewItem({
   )
 }
 
-export default function WebViewPanel({ accounts, activeId, onUnreadChange }: Props) {
+export default function WebViewPanel({ accounts, activeId, privacyMode, onUnreadChange }: Props) {
   if (accounts.length === 0) {
     return (
       <main className="webview-panel empty">
@@ -96,7 +98,7 @@ export default function WebViewPanel({ accounts, activeId, onUnreadChange }: Pro
   }
 
   return (
-    <main className="webview-panel">
+    <main className={`webview-panel${privacyMode ? ' privacy' : ''}`}>
       {accounts.map((account) => (
         <WebViewItem
           key={account.id}
@@ -105,6 +107,13 @@ export default function WebViewPanel({ accounts, activeId, onUnreadChange }: Pro
           onUnreadChange={(count) => onUnreadChange(account.id, count)}
         />
       ))}
+      {privacyMode && (
+        <div className="privacy-overlay">
+          <Icon name="eye-off" size={36} color="var(--text-secondary)" />
+          <span className="privacy-label">Privacy Mode</span>
+          <span className="privacy-hint">Press ⌘⇧L or click the eye icon to disable</span>
+        </div>
+      )}
     </main>
   )
 }

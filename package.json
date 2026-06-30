@@ -34,10 +34,12 @@
     },
     "files": ["out/**/*"],
     "mac": {
+      "icon": "build/icon.png",
       "target": ["dmg", "pkg"],
       "category": "public.app-category.productivity"
     },
     "win": {
+      "icon": "build/icon.ico",
       "target": ["nsis", "msi"]
     }
   }

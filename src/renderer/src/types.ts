@@ -29,6 +29,7 @@ export interface ElectronAPI {
   setSettings: (settings: Settings) => Promise<void>
   updateBadge: (count: number) => void
   openExternal: (url: string) => Promise<void>
+  onTogglePrivacy: (cb: () => void) => void
 }
 
 declare global {

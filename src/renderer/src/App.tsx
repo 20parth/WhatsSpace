@@ -19,6 +19,7 @@ export default function App() {
   const [settings, setSettingsState] = useState<Settings>(DEFAULT_SETTINGS)
   const [showSettings, setShowSettings] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [privacyMode, setPrivacyMode] = useState(false)
   const accountsRef = useRef<Account[]>([])
 
   useEffect(() => {
@@ -75,6 +76,9 @@ export default function App() {
     window.electronAPI.onSwitchAccount((index) => {
       const sorted = sortAccounts(accountsRef.current)
       if (sorted[index]) setActiveId(sorted[index].id)
+    })
+    window.electronAPI.onTogglePrivacy(() => {
+      setPrivacyMode((p) => !p)
     })
   }, [])
 
@@ -143,6 +147,7 @@ export default function App() {
         accounts={sorted}
         activeId={activeId}
         unreadCounts={unreadCounts}
+        privacyMode={privacyMode}
         onSelect={setActiveId}
         onAdd={addAccount}
         onRename={renameAccount}
@@ -150,8 +155,9 @@ export default function App() {
         onTogglePin={togglePin}
         onReorder={reorderAccounts}
         onOpenSettings={() => setShowSettings(true)}
+        onTogglePrivacy={() => setPrivacyMode((p) => !p)}
       />
-      <WebViewPanel accounts={accounts} activeId={activeId} onUnreadChange={setUnread} />
+      <WebViewPanel accounts={accounts} activeId={activeId} privacyMode={privacyMode} onUnreadChange={setUnread} />
       {showSettings && (
         <SettingsModal
           settings={settings}

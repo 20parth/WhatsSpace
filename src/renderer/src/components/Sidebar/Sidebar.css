@@ -188,6 +188,12 @@
   font-size: 13px;
 }
 
+.privacy-btn.active {
+  border-color: var(--accent);
+  background: var(--bg-active);
+  color: var(--accent);
+}
+
 /* ── Account item ────────────────────────────────── */
 .account-item {
   display: flex;

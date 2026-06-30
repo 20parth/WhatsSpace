@@ -11,6 +11,8 @@ import {
 import { join } from 'path'
 import Store from 'electron-store'
 
+app.name = 'WhatsSpace'
+
 interface Account {
   id: string
   name: string
@@ -43,6 +45,10 @@ const store = new Store<StoreSchema>()
 let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let isQuitting = false
+
+const iconPath = app.isPackaged
+  ? join(process.resourcesPath, 'icon.png')
+  : join(__dirname, '../../build/icon.png')
 
 function createTrayIcon(size = 22): Electron.NativeImage {
   const data = Buffer.alloc(size * size * 4)
@@ -115,6 +121,42 @@ function createTray(): void {
   })
 }
 
+function setupMenu(): void {
+  if (process.platform === 'darwin') {
+    const template: Electron.MenuItemConstructorOptions[] = [
+      {
+        label: app.name,
+        submenu: [
+          { role: 'about' },
+          { type: 'separator' },
+          { role: 'services' },
+          { type: 'separator' },
+          { role: 'hide' },
+          { role: 'hideOthers' },
+          { role: 'unhide' },
+          { type: 'separator' },
+          { role: 'quit' },
+        ],
+      },
+      {
+        label: 'Edit',
+        submenu: [
+          { role: 'undo' },
+          { role: 'redo' },
+          { type: 'separator' },
+          { role: 'cut' },
+          { role: 'copy' },
+          { role: 'paste' },
+          { role: 'selectAll' },
+        ],
+      },
+    ]
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+  } else {
+    Menu.setApplicationMenu(null)
+  }
+}
+
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -132,7 +174,7 @@ function createWindow(): void {
     },
   })
 
-  Menu.setApplicationMenu(null)
+  setupMenu()
 
   mainWindow.on('ready-to-show', () => {
     mainWindow!.show()
@@ -212,6 +254,9 @@ function registerShortcuts(): void {
       mainWindow?.webContents.send('switch-account', i - 1)
     })
   }
+  globalShortcut.register('CmdOrCtrl+Shift+L', () => {
+    mainWindow?.webContents.send('privacy:toggle')
+  })
 }
 
 ipcMain.handle('shell:open-external', (_event, url: string) => {
@@ -234,6 +279,17 @@ ipcMain.on('badge:update', (_event, count: number) => {
 })
 
 app.whenReady().then(() => {
+  if (process.platform === 'darwin') {
+    app.dock.setIcon(nativeImage.createFromPath(iconPath))
+    app.setAboutPanelOptions({
+      applicationName: 'WhatsSpace',
+      applicationVersion: '0.1.0',
+      version: '0.1.0',
+      copyright: '© 2025 Parth Bhawar · parthrb.dev',
+      iconPath,
+    })
+  }
+
   createWindow()
   createTray()
   registerShortcuts()
