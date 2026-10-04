@@ -9,9 +9,7 @@ import {
   nativeImage,
 } from 'electron'
 import { join } from 'path'
-import Store from 'electron-store'
-
-app.name = 'WhatsSpace'
+import { JsonStore } from './store'
 
 interface Account {
   id: string
@@ -41,14 +39,16 @@ const DEFAULT_SETTINGS: Settings = {
   minimizeToTray: false,
 }
 
-const store = new Store<StoreSchema>()
+const store = new JsonStore<StoreSchema>()
 let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let isQuitting = false
 
-const iconPath = app.isPackaged
-  ? join(process.resourcesPath, 'icon.png')
-  : join(__dirname, '../../build/icon.png')
+function getIconPath(): string {
+  return app.isPackaged
+    ? join(process.resourcesPath, 'icon.png')
+    : join(__dirname, '../../build/icon.png')
+}
 
 function createTrayIcon(size = 22): Electron.NativeImage {
   const data = Buffer.alloc(size * size * 4)
@@ -165,7 +165,7 @@ function createWindow(): void {
     minHeight: 560,
     show: false,
     title: 'WhatsSpace',
-    icon: iconPath,
+    icon: getIconPath(),
     autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -208,75 +208,67 @@ function createWindow(): void {
   }
 }
 
-app.on('web-contents-created', (_event, contents) => {
-  // Permissions + downloads: apply eagerly for webview-type contents
-  if (contents.getType() === 'webview') {
-    contents.session.setPermissionRequestHandler((_wc, permission, cb) => {
-      cb(['notifications', 'media', 'audioCapture'].includes(permission))
-    })
-    contents.session.on('will-download', (_event, item) => {
-      const savePath = join(app.getPath('downloads'), item.getFilename())
-      item.setSavePath(savePath)
-      item.once('done', (_e, state) => {
-        if (state === 'completed') shell.openPath(savePath)
+function setupWebContentsHandlers(): void {
+  app.on('web-contents-created', (_event, contents) => {
+    if (contents.getType() === 'webview') {
+      contents.session.setPermissionRequestHandler((_wc, permission, cb) => {
+        cb(['notifications', 'media', 'audioCapture'].includes(permission))
       })
-    })
-  }
+      contents.session.on('will-download', (_event, item) => {
+        const savePath = join(app.getPath('downloads'), item.getFilename())
+        item.setSavePath(savePath)
+        item.once('done', (_e, state) => {
+          if (state === 'completed') shell.openPath(savePath)
+        })
+      })
+    }
 
-  // Link interception: wait for first load so we can verify via URL.
-  // getType() can be unreliable at webContents construction time in Electron 31;
-  // checking the loaded URL avoids that race.
-  contents.once('did-finish-load', () => {
-    if (!contents.getURL().startsWith('https://web.whatsapp.com')) return
+    contents.once('did-finish-load', () => {
+      if (!contents.getURL().startsWith('https://web.whatsapp.com')) return
 
-    // window.open() / target="_blank" → open in system browser, deny the popup.
-    // Also handles whatsspace-open: pseudo-URLs from the injected window.open override.
-    contents.setWindowOpenHandler(({ url }) => {
-      let target = url
-      if (url.startsWith('whatsspace-open:')) {
-        target = decodeURIComponent(url.slice('whatsspace-open:'.length))
-      }
-      if (target.startsWith('http://') || target.startsWith('https://')) {
-        shell.openExternal(target).catch(console.error)
-      }
-      return { action: 'deny' }
-    })
-
-    // Top-level navigation away from WhatsApp (wa.me links, direct hrefs, etc.)
-    contents.on('will-navigate', (event, url) => {
-      if (!url.startsWith('https://web.whatsapp.com')) {
-        event.preventDefault()
-        if (url.startsWith('http://') || url.startsWith('https://')) {
-          shell.openExternal(url).catch(console.error)
+      contents.setWindowOpenHandler(({ url }) => {
+        let target = url
+        if (url.startsWith('whatsspace-open:')) {
+          target = decodeURIComponent(url.slice('whatsspace-open:'.length))
         }
-      }
-    })
+        if (target.startsWith('http://') || target.startsWith('https://')) {
+          shell.openExternal(target).catch(console.error)
+        }
+        return { action: 'deny' }
+      })
 
-    // Inject into the page itself: override window.open so WhatsApp's
-    // "Open link" dialog routes through setWindowOpenHandler via a hidden
-    // anchor click using the whatsspace-open: pseudo-protocol.
-    contents.executeJavaScript(`
-      (function () {
-        if (window.__wsPatched) return
-        window.__wsPatched = true
-        const _open = window.open.bind(window)
-        window.open = function (url, target, features) {
-          const href = typeof url === 'string' ? url : (url && url.toString ? url.toString() : '')
-          if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
-            const a = document.createElement('a')
-            a.href = 'whatsspace-open:' + encodeURIComponent(href)
-            a.target = '_blank'
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-            return null
+      contents.on('will-navigate', (event, url) => {
+        if (!url.startsWith('https://web.whatsapp.com')) {
+          event.preventDefault()
+          if (url.startsWith('http://') || url.startsWith('https://')) {
+            shell.openExternal(url).catch(console.error)
           }
-          return _open(url, target, features)
         }
-      })()
-    `).catch(() => {})
+      })
+
+      contents.executeJavaScript(`
+        (function () {
+          if (window.__wsPatched) return
+          window.__wsPatched = true
+          const _open = window.open.bind(window)
+          window.open = function (url, target, features) {
+            const href = typeof url === 'string' ? url : (url && url.toString ? url.toString() : '')
+            if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+              const a = document.createElement('a')
+              a.href = 'whatsspace-open:' + encodeURIComponent(href)
+              a.target = '_blank'
+              document.body.appendChild(a)
+              a.click()
+              document.body.removeChild(a)
+              return null
+            }
+            return _open(url, target, features)
+          }
+        })()
+      `).catch(() => {})
+    })
   })
-})
+}
 
 function registerShortcuts(): void {
   for (let i = 1; i <= 9; i++) {
@@ -289,37 +281,43 @@ function registerShortcuts(): void {
   })
 }
 
-ipcMain.handle('shell:open-external', (_event, url: string) => {
-  return shell.openExternal(url)
-})
+function setupIPC(): void {
+  ipcMain.handle('shell:open-external', (_event, url: string) => {
+    return shell.openExternal(url)
+  })
 
-ipcMain.handle('accounts:get', () => store.get('accounts', []))
-ipcMain.handle('accounts:set', (_event, accounts: Account[]) => {
-  store.set('accounts', accounts)
-})
+  ipcMain.handle('accounts:get', () => store.get('accounts', []))
+  ipcMain.handle('accounts:set', (_event, accounts: Account[]) => {
+    store.set('accounts', accounts)
+  })
 
-ipcMain.handle('settings:get', () => store.get('settings', DEFAULT_SETTINGS))
-ipcMain.handle('settings:set', (_event, settings: Settings) => {
-  store.set('settings', settings)
-  app.setLoginItemSettings({ openAtLogin: settings.launchOnStartup })
-})
+  ipcMain.handle('settings:get', () => store.get('settings', DEFAULT_SETTINGS))
+  ipcMain.handle('settings:set', (_event, settings: Settings) => {
+    store.set('settings', settings)
+    app.setLoginItemSettings({ openAtLogin: settings.launchOnStartup })
+  })
 
-ipcMain.on('badge:update', (_event, count: number) => {
-  updateBadge(count)
-})
+  ipcMain.on('badge:update', (_event, count: number) => {
+    updateBadge(count)
+  })
+}
 
 app.whenReady().then(() => {
+  app.name = 'WhatsSpace'
+
   if (process.platform === 'darwin') {
-    app.dock.setIcon(nativeImage.createFromPath(iconPath))
+    app.dock.setIcon(nativeImage.createFromPath(getIconPath()))
     app.setAboutPanelOptions({
       applicationName: 'WhatsSpace',
       applicationVersion: '0.1.0',
       version: '0.1.0',
       copyright: '© 2025 Parth Bhawar · parthrb.dev',
-      iconPath,
+      iconPath: getIconPath(),
     })
   }
 
+  setupIPC()
+  setupWebContentsHandlers()
   createWindow()
   createTray()
   registerShortcuts()
@@ -328,16 +326,16 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
     else mainWindow?.show()
   })
-})
 
-app.on('before-quit', () => {
-  isQuitting = true
-})
+  app.on('before-quit', () => {
+    isQuitting = true
+  })
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit()
+  })
 
-app.on('will-quit', () => {
-  globalShortcut.unregisterAll()
+  app.on('will-quit', () => {
+    globalShortcut.unregisterAll()
+  })
 })
