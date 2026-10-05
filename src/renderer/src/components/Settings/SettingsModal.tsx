@@ -3,6 +3,8 @@ import { Settings } from '../../types'
 import Icon from '../Icon/Icon'
 import './Settings.css'
 
+declare const __APP_VERSION__: string
+
 interface Props {
   settings: Settings
   onSave: (s: Settings) => void
@@ -110,7 +112,7 @@ export default function SettingsModal({ settings, onSave, onClose }: Props) {
             </div>
             <div>
               <div className="credits-app-name">WhatsSpace</div>
-              <div className="credits-version">v0.1.0</div>
+              <div className="credits-version">v{__APP_VERSION__}</div>
             </div>
           </div>
           <div className="credits-line">
