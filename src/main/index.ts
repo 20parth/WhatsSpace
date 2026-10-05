@@ -311,8 +311,8 @@ app.whenReady().then(() => {
     app.dock.setIcon(nativeImage.createFromPath(iconPath))
     app.setAboutPanelOptions({
       applicationName: 'WhatsSpace',
-      applicationVersion: '0.1.0',
-      version: '0.1.0',
+      applicationVersion: '0.1.1',
+      version: '0.1.1',
       copyright: '© 2025 Parth Bhawar · parthrb.dev',
       iconPath,
     })
