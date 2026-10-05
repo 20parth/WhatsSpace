@@ -1,6 +1,6 @@
 {
   "name": "whatsspace",
-  "version": "0.1.1",
+  "version": "1.1.1",
   "description": "Multi-account WhatsApp Web desktop wrapper",
   "main": "out/main/index.js",
   "author": "Parth Bhawar",

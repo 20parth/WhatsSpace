@@ -25,7 +25,7 @@ export default defineConfig({
     },
     plugins: [react()],
     define: {
-      __APP_VERSION__: JSON.stringify('0.1.1'),
+      __APP_VERSION__: JSON.stringify('1.1.1'),
       __GITHUB_REPO__: JSON.stringify('https://github.com/20parth/WhatsSpace'),
     }
   }
