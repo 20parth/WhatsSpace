@@ -9,28 +9,8 @@ permissions:
   contents: write
 
 jobs:
-  # ── Step 1: create the GitHub Release with auto-generated notes ──────────
-  create-release:
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.tag.outputs.tag }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - id: tag
-        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-      - uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          generate_release_notes: true
-          draft: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ── Step 2a: build macOS DMG (Intel + Apple Silicon) ────────────────────
+  # ── Build macOS (Intel + Apple Silicon) ─────────────────────────────────
   build-mac:
-    needs: create-release
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,15 +24,18 @@ jobs:
 
       - run: npm run build
 
-      - name: Build & upload macOS DMG
-        run: npx electron-builder --mac --x64 --arm64 --publish always
+      - name: Build macOS DMG
+        run: npx electron-builder --mac --x64 --arm64 --publish never
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
-  # ── Step 2b: build Windows installer (.exe) ──────────────────────────────
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-artifacts
+          path: dist/*.dmg
+
+  # ── Build Windows installer (.exe) ──────────────────────────────────────
   build-windows:
-    needs: create-release
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -66,7 +49,29 @@ jobs:
 
       - run: npm run build
 
-      - name: Build & upload Windows installer
-        run: npx electron-builder --win --x64 --publish always
+      - name: Build Windows installer
+        run: npx electron-builder --win --x64 --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: win-artifacts
+          path: dist/*.exe
+
+  # ── Publish GitHub Release with all artifacts ────────────────────────────
+  release:
+    needs: [build-mac, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
