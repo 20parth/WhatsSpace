@@ -138,10 +138,11 @@
 .sidebar-footer {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px;
+  gap: 3px;
+  padding: 8px 6px;
   flex-shrink: 0;
   border-top: 1px solid var(--border);
+  overflow: hidden;
 }
 
 .sidebar.collapsed .sidebar-footer {
@@ -153,7 +154,7 @@
 .footer-icon-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   height: 34px;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -174,25 +175,31 @@
 
 .add-btn {
   flex: 1;
-  padding: 0 12px;
+  min-width: 0;
+  padding: 0 9px;
   justify-content: flex-start;
+  overflow: hidden;
 }
 
 .sidebar.collapsed .add-btn {
   flex: none;
-  width: 36px;
+  width: 34px;
   padding: 0;
   justify-content: center;
 }
 
 .footer-icon-btn:not(.add-btn) {
-  width: 36px;
+  width: 34px;
+  flex-shrink: 0;
   padding: 0;
   justify-content: center;
 }
 
 .footer-btn-label {
   font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .privacy-btn.active {
