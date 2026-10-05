@@ -73,5 +73,20 @@ jobs:
         with:
           files: dist/*
           generate_release_notes: true
+          body: |
+            ## Installation
+
+            | Platform | File |
+            |---|---|
+            | macOS Apple Silicon | `WhatsSpace-*-arm64.dmg` |
+            | macOS Intel | `WhatsSpace-*-x64.dmg` |
+            | Windows | `WhatsSpace-Setup-*.exe` |
+
+            ### macOS: "damaged and can't be opened"
+            macOS blocks unsigned apps downloaded from the internet. Run this once in Terminal after installing:
+            ```bash
+            xattr -cr /Applications/WhatsSpace.app
+            ```
+            Or right-click the app → **Open** → **Open**.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

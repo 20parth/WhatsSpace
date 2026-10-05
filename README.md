@@ -16,6 +16,16 @@ A multi-account WhatsApp Web desktop app built with Electron. Run multiple Whats
 
 Or browse all releases → [github.com/20parth/WhatsSpace/releases](https://github.com/20parth/WhatsSpace/releases)
 
+### macOS: "damaged and can't be opened"
+
+macOS blocks unsigned apps downloaded from the internet. WhatsSpace is open-source and not yet notarized with Apple. To open it, run this once in Terminal after installing:
+
+```bash
+xattr -cr /Applications/WhatsSpace.app
+```
+
+Then double-click the app normally. Alternatively: right-click the app → **Open** → **Open** in the dialog.
+
 ---
 
 ## Features
