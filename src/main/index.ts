@@ -130,7 +130,10 @@ function setupMenu(): void {
       {
         label: app.name,
         submenu: [
-          { role: 'about' },
+          {
+            label: `About ${app.name}`,
+            click: () => mainWindow?.webContents.send('open-about'),
+          },
           { type: 'separator' },
           { role: 'services' },
           { type: 'separator' },
@@ -307,15 +310,7 @@ function setupIPC(): void {
 
 app.whenReady().then(() => {
   if (process.platform === 'darwin') {
-    const iconPath = getIconPath()
-    app.dock.setIcon(nativeImage.createFromPath(iconPath))
-    app.setAboutPanelOptions({
-      applicationName: 'WhatsSpace',
-      applicationVersion: '0.1.1',
-      version: '0.1.1',
-      copyright: '© 2025 Parth Bhawar · parthrb.dev',
-      iconPath,
-    })
+    app.dock.setIcon(nativeImage.createFromPath(getIconPath()))
   }
 
   setupIPC()

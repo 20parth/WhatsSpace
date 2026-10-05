@@ -82,6 +82,9 @@ export default function App() {
     window.electronAPI.onTogglePrivacy(() => {
       setPrivacyMode((p) => !p)
     })
+    window.electronAPI.onOpenAbout(() => {
+      setShowAbout(true)
+    })
   }, [])
 
   const saveSettings = useCallback(async (next: Settings) => {

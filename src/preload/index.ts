@@ -11,4 +11,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   updateBadge: (count: number) => ipcRenderer.send('badge:update', count),
   openExternal: (url: string) => ipcRenderer.invoke('shell:open-external', url),
   onTogglePrivacy: (cb: () => void) => ipcRenderer.on('privacy:toggle', () => cb()),
+  onOpenAbout: (cb: () => void) => ipcRenderer.on('open-about', () => cb()),
 })
