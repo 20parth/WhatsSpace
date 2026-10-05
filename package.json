@@ -3,8 +3,12 @@
   "version": "0.1.0",
   "description": "Multi-account WhatsApp Web desktop wrapper",
   "main": "out/main/index.js",
-  "author": "WhatsSpace",
+  "author": "Parth Bhawar",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/20parth/WhatsSpace.git"
+  },
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
@@ -32,20 +36,37 @@
     "files": [
       "out/**/*"
     ],
+    "extraResources": [
+      { "from": "build/icon.png", "to": "icon.png" }
+    ],
     "mac": {
       "icon": "build/icon.png",
       "target": [
-        "dmg",
-        "pkg"
+        { "target": "dmg", "arch": ["x64", "arm64"] }
       ],
       "category": "public.app-category.productivity"
+    },
+    "dmg": {
+      "artifactName": "${productName}-${version}-${arch}.dmg"
     },
     "win": {
       "icon": "build/icon.ico",
       "target": [
-        "nsis",
-        "zip"
+        { "target": "nsis", "arch": ["x64"] }
       ]
-    }
+    },
+    "nsis": {
+      "artifactName": "${productName}-Setup-${version}.exe",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "20parth",
+        "repo": "WhatsSpace"
+      }
+    ]
   }
 }

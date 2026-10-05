@@ -11,6 +11,9 @@ import {
 import { join } from 'path'
 import { JsonStore } from './store'
 
+// Set name before ready so macOS menu bar shows correct title
+app.name = 'WhatsSpace'
+
 interface Account {
   id: string
   name: string
@@ -303,16 +306,15 @@ function setupIPC(): void {
 }
 
 app.whenReady().then(() => {
-  app.name = 'WhatsSpace'
-
   if (process.platform === 'darwin') {
-    app.dock.setIcon(nativeImage.createFromPath(getIconPath()))
+    const iconPath = getIconPath()
+    app.dock.setIcon(nativeImage.createFromPath(iconPath))
     app.setAboutPanelOptions({
       applicationName: 'WhatsSpace',
       applicationVersion: '0.1.0',
       version: '0.1.0',
       copyright: '© 2025 Parth Bhawar · parthrb.dev',
-      iconPath: getIconPath(),
+      iconPath,
     })
   }
 

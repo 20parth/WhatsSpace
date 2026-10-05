@@ -18,6 +18,7 @@ interface Props {
   onTogglePin: (id: string) => void
   onReorder: (accounts: Account[]) => void
   onOpenSettings: () => void
+  onOpenAbout: () => void
   onTogglePrivacy: () => void
 }
 
@@ -33,6 +34,7 @@ export default function Sidebar({
   onTogglePin,
   onReorder,
   onOpenSettings,
+  onOpenAbout,
   onTogglePrivacy,
 }: Props) {
   const [collapsed, setCollapsed] = useState(false)
@@ -138,6 +140,13 @@ export default function Sidebar({
           title={`Privacy mode (⌘⇧L) — ${privacyMode ? 'on' : 'off'}`}
         >
           <Icon name={privacyMode ? 'eye-off' : 'eye'} size={16} color={privacyMode ? 'var(--accent)' : 'currentColor'} />
+        </button>
+        <button
+          className="footer-icon-btn"
+          onClick={onOpenAbout}
+          title="About"
+        >
+          <Icon name="info" size={16} />
         </button>
         <button
           className="footer-icon-btn"

@@ -1,0 +1,184 @@
+.about-modal {
+  width: 400px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+/* ── Header ──────────────────────────────────────── */
+.about-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.about-app-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.about-icon-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--bg-active);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-app-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+
+.about-version {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+
+/* ── Sections ────────────────────────────────────── */
+.about-section {
+  margin-bottom: 18px;
+}
+
+.about-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.about-body {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.about-muted {
+  font-size: 12px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  margin: 0;
+}
+
+/* ── Release ─────────────────────────────────────── */
+.about-release {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.about-release-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.about-tag-badge {
+  display: inline-block;
+  background: var(--bg-active);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.about-release-date {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.about-release-notes {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+  opacity: 0.85;
+}
+
+/* ── Buttons ─────────────────────────────────────── */
+.about-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.15s;
+}
+
+.about-link-btn:hover {
+  text-decoration-color: var(--accent);
+}
+
+.about-inline-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--accent);
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.15s;
+}
+
+.about-inline-link:hover {
+  text-decoration-color: var(--accent);
+}
+
+/* ── Developer ───────────────────────────────────── */
+.about-developer {
+  margin-bottom: 0;
+}
+
+.about-dev-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.about-dev-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.about-dev-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.about-dev-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.about-dot {
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}

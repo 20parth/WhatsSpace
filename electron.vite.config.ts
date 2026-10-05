@@ -23,6 +23,10 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [react()]
+    plugins: [react()],
+    define: {
+      __APP_VERSION__: JSON.stringify('0.1.0'),
+      __GITHUB_REPO__: JSON.stringify('https://github.com/20parth/WhatsSpace'),
+    }
   }
 })

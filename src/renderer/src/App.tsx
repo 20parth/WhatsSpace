@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import Sidebar from './components/Sidebar/Sidebar'
 import WebViewPanel from './components/WebViewPanel/WebViewPanel'
 import SettingsModal from './components/Settings/SettingsModal'
+import AboutModal from './components/About/AboutModal'
 import { Account, Settings, DEFAULT_SETTINGS } from './types'
 import { generateId, sortAccounts, DEFAULT_ACCOUNTS } from './utils'
 
@@ -18,6 +19,7 @@ export default function App() {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
   const [settings, setSettingsState] = useState<Settings>(DEFAULT_SETTINGS)
   const [showSettings, setShowSettings] = useState(false)
+  const [showAbout, setShowAbout] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [privacyMode, setPrivacyMode] = useState(false)
   const accountsRef = useRef<Account[]>([])
@@ -155,6 +157,7 @@ export default function App() {
         onTogglePin={togglePin}
         onReorder={reorderAccounts}
         onOpenSettings={() => setShowSettings(true)}
+        onOpenAbout={() => setShowAbout(true)}
         onTogglePrivacy={() => setPrivacyMode((p) => !p)}
       />
       <WebViewPanel accounts={accounts} activeId={activeId} privacyMode={privacyMode} onUnreadChange={setUnread} />
@@ -165,6 +168,7 @@ export default function App() {
           onClose={() => setShowSettings(false)}
         />
       )}
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
     </div>
   )
 }
